@@ -1,7 +1,20 @@
 #!/bin/bash
-# https://linuxacademy.com/blog/linux/conditions-in-bash-scripting-if-statements#double-parenthesis-syntax
-# http://unix.stackexchange.com/questions/53150/how-do-i-resize-the-active-window-to-50-with-wmctrl
-# http://www.tldp.org/LDP/abs/html/comparison-ops.html
+
+# requires: xdotool, xwininfo
+
+# usage:
+#  $ ./resize_window.sh {left|right} {short|long}
+#   e.g. "./resize_window.sh right short"
+
+# TODO 
+#   - support different resolutions (mixed as well)
+#   - support more than 2 displays
+#   - support monitor 'hopping'
+
+# references:
+#   https://linuxacademy.com/blog/linux/conditions-in-bash-scripting-if-statements#double-parenthesis-syntax
+#   http://unix.stackexchange.com/questions/53150/how-do-i-resize-the-active-window-to-50-with-wmctrl
+#   http://www.tldp.org/LDP/abs/html/comparison-ops.html
 
 CHARS_WIDE=86
 ASSUMED_WIDTH=1920
@@ -9,7 +22,6 @@ ASSUMED_HEIGHT=1080
 
 PIXELS_PER_CHAR=9
 
-TOPMARGIN=18
 
 # get width of screen and height of screen
 SCREEN_WIDTH=$(xwininfo -root | awk '$1=="Width:" {print $2}')
@@ -17,9 +29,12 @@ SCREEN_WIDTH=$(xwininfo -root | awk '$1=="Width:" {print $2}')
 
 PROCESS_NAME=$(cat /proc/$(xdotool getwindowpid $(xdotool getwindowfocus))/comm)
 
-if [ "$PROCESS_NAME" = "xfce4-terminal" ]; then
+if [ "$PROCESS_NAME" = "chrome" ]; then
+  TOPMARGIN=18
+else
   TOPMARGIN=30
 fi
+
 
 UPPER_LEFT_X=$(xwininfo -id $(xdotool getactivewindow) | sed -n -e "s/^ \+Absolute upper-left X: \+\([0-9]\+\).*/\1/p")
 
