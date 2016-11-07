@@ -3,8 +3,9 @@
 # requires: xdotool, xwininfo
 
 # usage:
-#  $ ./resize_window.sh {left|right} {short|long}
-#   e.g. "./resize_window.sh right short"
+#   resize_window.sh {left|right} {short|long}
+#     e.g. 
+#   $ ./resize_window.sh right short
 
 # TODO 
 #   - support different resolutions (mixed as well)
@@ -29,6 +30,7 @@ SCREEN_WIDTH=$(xwininfo -root | awk '$1=="Width:" {print $2}')
 
 PROCESS_NAME=$(cat /proc/$(xdotool getwindowpid $(xdotool getwindowfocus))/comm)
 
+# HACK for using 'chrome' system menu vs desktop menu
 if [ "$PROCESS_NAME" = "chrome" ]; then
   TOPMARGIN=18
 else
