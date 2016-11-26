@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# requires: xdotool, xwininfo
+# requires: xdotool, wmctrl
 
 # usage:
 #   resize_window.sh {left|right} {short|long}
