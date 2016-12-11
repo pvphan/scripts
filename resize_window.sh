@@ -70,6 +70,6 @@ elif [ "$1" = "right" ]; then
   X=$(( $CURRENT_MONITOR*$ASSUMED_WIDTH + ($ASSUMED_WIDTH-$W) ))
 fi
 
+# HACK: do it twice to ensure propper resize
 wmctrl -r :ACTIVE: -b remove,maximized_vert,maximized_horz && wmctrl -r :ACTIVE: -e 0,$X,$Y,$W,$H
-
-echo $X, $Y, $W, $H
+wmctrl -r :ACTIVE: -b remove,maximized_vert,maximized_horz && wmctrl -r :ACTIVE: -e 0,$X,$Y,$W,$H
