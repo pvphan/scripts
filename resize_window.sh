@@ -1,4 +1,5 @@
 #!/bin/bash
+# NOTE: this version for XPS 13
 
 # requires: xdotool, wmctrl
 
@@ -20,6 +21,7 @@
 CHARS_WIDE=86
 ASSUMED_WIDTH=1920
 ASSUMED_HEIGHT=1080
+UNITY_TOOLBAR_WIDTH=74
 
 PIXELS_PER_CHAR=9
 
@@ -30,20 +32,24 @@ SCREEN_WIDTH=$(xwininfo -root | awk '$1=="Width:" {print $2}')
 
 PROCESS_NAME=$(cat /proc/$(xdotool getwindowpid $(xdotool getwindowfocus))/comm)
 
-# HACK for using 'chrome' system menu vs desktop menu
-if [ "$PROCESS_NAME" = "chrome" ]; then
-  TOPMARGIN=18
-else
-  TOPMARGIN=30
-fi
+TOPMARGIN=18
+## HACK for using 'chrome' system menu vs desktop menu
+#if [ "$PROCESS_NAME" = "chrome" ]; then
+#  TOPMARGIN=18
+#else
+#  TOPMARGIN=30
+#fi
 
 
 UPPER_LEFT_X=$(xwininfo -id $(xdotool getactivewindow) | sed -n -e "s/^ \+Absolute upper-left X: \+\([0-9]\+\).*/\1/p")
+UPPER_LEFT_Y=$(xwininfo -id $(xdotool getactivewindow) | sed -n -e "s/^ \+Absolute upper-left Y: \+\([0-9]\+\).*/\1/p")
+
+echo $UPPER_LEFT_X, $UPPER_LEFT_Y
 
 if [ "$2" = "long" ]; then
-  W=$(( $ASSUMED_WIDTH - ($CHARS_WIDE*$PIXELS_PER_CHAR) ))
+  W=$(( $ASSUMED_WIDTH - $UNITY_TOOLBAR_WIDTH - ($CHARS_WIDE*$PIXELS_PER_CHAR) ))
 elif [ "$2" = "short" ]; then
-  W=$(($CHARS_WIDE*$PIXELS_PER_CHAR ))
+  W=$(( $CHARS_WIDE*$PIXELS_PER_CHAR ))
 fi
 
 H=$(( $ASSUMED_HEIGHT - 2 * $TOPMARGIN ))
@@ -55,12 +61,15 @@ if (($SCREEN_WIDTH > $ASSUMED_WIDTH)); then
   CURRENT_MONITOR=$(($UPPER_LEFT_X / $ASSUMED_WIDTH))
 fi
 
-Y=0
+Y=$(( $UPPER_LEFT_Y - 200 ))
 
 if [ "$1" = "left" ]; then
   X=$(( $CURRENT_MONITOR*$ASSUMED_WIDTH ))
+  #X=$(( $UPPER_LEFT_X - 65 ))
 elif [ "$1" = "right" ]; then
   X=$(( $CURRENT_MONITOR*$ASSUMED_WIDTH + ($ASSUMED_WIDTH-$W) ))
 fi
 
 wmctrl -r :ACTIVE: -b remove,maximized_vert,maximized_horz && wmctrl -r :ACTIVE: -e 0,$X,$Y,$W,$H
+
+echo $X, $Y, $W, $H
